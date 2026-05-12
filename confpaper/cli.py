@@ -210,6 +210,7 @@ async def _search_async(
     match_threshold: float | None = None,
     author: str | None = None,
     near_misses_limit: int = 5,
+    db_path: Path | None = None,
 ):
     """Core async search logic."""
     venues = _parse_venues(venue)
@@ -218,19 +219,12 @@ async def _search_async(
     # Detect source aliases passed via --venue (e.g. -v general, -v journal).
     # These should be converted to source routing, not treated as venue names.
     SOURCE_ALIASES = {
-        "general": "arxiv", "journal": "arxiv", "journals": "arxiv",
-        "arxiv": "arxiv",
+        "general": "general", "journal": "general", "journals": "general",
+        "arxiv": "arxiv", "semantic": "semantic_scholar",
+        "semantic_scholar": "semantic_scholar", "ss": "semantic_scholar",
     }
-    _SS_ALIASES = {"semantic", "semantic_scholar", "ss"}
-    for v in venues:
-        if v.lower() in _SS_ALIASES:
-            console.print(
-                "[red]Error:[/red] Semantic Scholar is not included in the "
-                "public version. Use --source arxiv instead."
-            )
-            raise typer.Exit(code=1)
     alias_venues = [v for v in venues if v.lower() in SOURCE_ALIASES]
-    real_venues = [v for v in venues if v.lower() not in SOURCE_ALIASES and v.lower() not in _SS_ALIASES]
+    real_venues = [v for v in venues if v.lower() not in SOURCE_ALIASES]
 
     if alias_venues and real_venues:
         console.print(
@@ -270,14 +264,14 @@ async def _search_async(
         near_misses = result.near_misses
 
         # Post-filter: enforce --year range on final results.
-        # arXiv may return papers outside the requested year range.
+        # Sources (especially arXiv / Semantic Scholar) may return papers
         # outside the requested year range.
         if years:
             papers = [p for p in papers if p.year is not None and p.year in years]
             near_misses = [p for p in near_misses if p.year is not None and p.year in years]
     except NotImplementedError as e:
         console.print(f"[yellow]{e}[/yellow]")
-        if source in ("general", "arxiv"):
+        if source in ("general", "arxiv", "semantic_scholar"):
             console.print(
                 "[dim]General search is planned for Phase 2. "
                 "Current working source: CVF. "
@@ -354,13 +348,14 @@ async def _search_async(
 
     # --- Download if requested ---
     if download:
-        await _download_papers(papers, query, output_dir)
+        await _download_papers(papers, query, output_dir, db_path=db_path)
 
 
 async def _download_papers(
     papers: list,
     query: str,
     output_dir: Path,
+    db_path: Path | None = None,
 ):
     """Download PDFs for a list of papers."""
     console.print(f"\n[bold]Downloading {len(papers)} papers...[/bold]")
@@ -368,7 +363,7 @@ async def _download_papers(
 
     import httpx
     for i, paper in enumerate(papers, 1):
-        result = await download_paper(paper, output_dir, client=None)
+        result = await download_paper(paper, output_dir, client=None, db_path=db_path)
         key = paper.id or str(i)
         download_results[key] = result
 
@@ -434,7 +429,7 @@ def search(
     source: str = typer.Option(
         "auto",
         "--source", "-s",
-        help="Search source: auto, cvf, openreview, aaai, arxiv, general",
+        help="Search source: auto, cvf, openreview, general, arxiv, semantic_scholar",
     ),
     match_mode: str = typer.Option(
         "normal",
@@ -448,6 +443,10 @@ def search(
     ),
     near_misses_limit: int = typer.Option(
         5, "--near-misses", help="Show up to N near misses for AND queries with no exact matches (0=off)",
+    ),
+    db: Path = typer.Option(
+        Path("data/papers.sqlite"),
+        "--db", help="Path to download tracking database",
     ),
 ):
     """Search for AI/CV conference papers."""
@@ -471,6 +470,7 @@ def search(
         match_threshold=match_threshold,
         author=author,
         near_misses_limit=near_misses_limit,
+        db_path=db if download else None,
     ))
 
 
@@ -540,6 +540,32 @@ def bib(
     console.print(
         "[dim]For now, use 'confpaper search' to find and download papers.[/dim]"
     )
+
+
+@app.command()
+def export_downloads(
+    output: Path = typer.Option(
+        Path("downloads.csv"),
+        "--output", "-o",
+        help="Output CSV file path",
+    ),
+    db: Path = typer.Option(
+        Path("data/papers.sqlite"),
+        "--db", help="Path to download tracking database",
+    ),
+):
+    """Export download history to a CSV file."""
+    from confpaper.database import export_downloads_to_csv
+
+    if not db.exists():
+        console.print("[yellow]No download database found.[/yellow]")
+        raise typer.Exit()
+
+    count = export_downloads_to_csv(db, output)
+    if count == 0:
+        console.print("[yellow]No download records to export.[/yellow]")
+    else:
+        console.print(f"[green]Exported {count} records to {output}[/green]")
 
 
 def main():
