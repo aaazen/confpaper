@@ -15,6 +15,7 @@ OJS_BASE = "https://ojs.aaai.org/index.php/AAAI/"
 # AAAI proceedings span multiple OJS issues per year (one per technical track).
 # Issue ranges verified from https://ojs.aaai.org/index.php/AAAI/issue/archive
 AAAI_ISSUE_RANGES = {
+    2026: range(637, 650),  # Vol 40, Tracks 1-13
     2025: range(624, 637),  # Vol 39, Tracks 1-13
     2024: range(576, 583),  # Vol 38, Tracks 1-7
     2023: range(548, 561),  # Vol 37, Tracks 1-13
