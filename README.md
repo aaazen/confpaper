@@ -3,15 +3,12 @@
 A CLI tool for searching and downloading AI/CV conference papers from official
 sources and arXiv.
 
-> This public version does not use Semantic Scholar and does not require any
-> private API key.
-
 ## Features
 
 - Search AI/CV conference papers from official sources
 - Default venues: CVPR, ICCV, ECCV, WACV, AAAI, ICLR, ICML, NeurIPS
 - Search by keyword, title, author
-- Year and year-range filtering (`-y 2023-2025`)
+- Year and year-range filtering (`-y 2023-2026`)
 - AND query with `+` (e.g. `yolo + object detection`)
 - arXiv search via `--source arxiv` or `--source general`
 - PDF download with `--download`
