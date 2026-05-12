@@ -15,7 +15,9 @@ sources and arXiv.
 - AND query with `+` (e.g. `yolo + object detection`)
 - arXiv search via `--source arxiv` or `--source general`
 - PDF download with `--download`
+- Automatic download deduplication via SQLite
 - Local file organization by venue and year
+- Export download history to CSV
 
 ## Supported sources
 
@@ -85,6 +87,7 @@ feature selection         # fixed phrase search
 | `--near-misses` | Show near misses for AND queries (default: 5) |
 | `--download`, `-d` | Download PDFs for matching papers |
 | `--output-dir`, `-o` | Directory for downloaded PDFs |
+| `--db` | Path to download tracking database (default: `data/papers.sqlite`) |
 | `--source`, `-s` | Search source: `auto`, `cvf`, `openreview`, `aaai`, `arxiv`, `general` |
 
 ## Venue filtering
@@ -97,13 +100,35 @@ confpaper search "object detection" -v ICCV -y 2023-2025  # odd years only
 confpaper search "object detection" -v ECCV -y 2023-2025  # even years only
 ```
 
-## Downloading PDFs
+## Download tracking
 
-PDFs are saved to `downloads/{venue}/{year}/{clean_title}.pdf`.
+confpaper uses a SQLite database (`data/papers.sqlite`) to track downloaded
+papers and avoid duplicate downloads. Deduplication uses the first available of:
+arxiv ID, DOI, paper ID, or normalized title + year.
 
 ```bash
+# Download PDFs (automatically records and deduplicates)
 confpaper search "yolo + object detection" -y 2023-2025 --download
+
+# Use a custom database path
+confpaper search "yolo + object detection" -y 2023-2025 --download --db my_tracking.sqlite
 ```
+
+**Behavior:**
+
+- If a paper was already downloaded and the file still exists → **skipped**.
+- If the database has a record but the PDF is missing or 0-byte → **re-downloaded**
+  and the record is updated.
+- If a file exists on disk but isn't tracked yet → recorded and skipped.
+
+### Export download history
+
+```bash
+confpaper export-downloads -o downloads.csv
+confpaper export-downloads -o downloads.csv --db data/papers.sqlite
+```
+
+PDFs are saved to `downloads/{venue}/{year}/{clean_title}.pdf`.
 
 ## arXiv search
 
@@ -131,6 +156,7 @@ confpaper/
   matcher.py       Query classification and matching
   models.py        Paper data model
   downloader.py    PDF downloader
+  database.py      Download tracking (SQLite)
   utils.py         Venue normalization, helpers
   sources/
     cvf.py         CVPR, ICCV, WACV, ECCV
