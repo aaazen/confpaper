@@ -1,0 +1,122 @@
+venues:
+  CVPR:
+    name: "IEEE/CVF Conference on Computer Vision and Pattern Recognition"
+    aliases:
+      - "CVPR"
+      - "Proc. CVPR"
+      - "Proceedings of CVPR"
+      - "IEEE/CVF Conference on Computer Vision and Pattern Recognition"
+      - "IEEE Conference on Computer Vision and Pattern Recognition"
+      - "Conference on Computer Vision and Pattern Recognition"
+    cvf_code: "CVPR"
+    openreview_id: null
+
+  ICCV:
+    name: "IEEE/CVF International Conference on Computer Vision"
+    aliases:
+      - "ICCV"
+      - "Proc. ICCV"
+      - "Proceedings of ICCV"
+      - "IEEE/CVF International Conference on Computer Vision"
+      - "IEEE International Conference on Computer Vision"
+      - "International Conference on Computer Vision"
+    cvf_code: "ICCV"
+    openreview_id: null
+
+  WACV:
+    name: "IEEE/CVF Winter Conference on Applications of Computer Vision"
+    aliases:
+      - "WACV"
+      - "Proc. WACV"
+      - "IEEE/CVF Winter Conference on Applications of Computer Vision"
+      - "Winter Conference on Applications of Computer Vision"
+    cvf_code: "WACV"
+    openreview_id: null
+
+  ECCV:
+    name: "European Conference on Computer Vision"
+    aliases:
+      - "ECCV"
+      - "European Conference on Computer Vision"
+      - "Proc. ECCV"
+      - "Proceedings of ECCV"
+    cvf_code: null
+    openreview_id: null
+
+  NeurIPS:
+    name: "Conference on Neural Information Processing Systems"
+    aliases:
+      - "NeurIPS"
+      - "NIPS"
+      - "Advances in Neural Information Processing Systems"
+      - "Neural Information Processing Systems"
+      - "Conference on Neural Information Processing Systems"
+      - "Proc. NeurIPS"
+      - "Proceedings of NeurIPS"
+    cvf_code: null
+    openreview_id: "NeurIPS.cc"
+
+  ICLR:
+    name: "International Conference on Learning Representations"
+    aliases:
+      - "ICLR"
+      - "International Conference on Learning Representations"
+      - "Proc. ICLR"
+      - "Proceedings of ICLR"
+    cvf_code: null
+    openreview_id: "ICLR.cc"
+
+  ICML:
+    name: "International Conference on Machine Learning"
+    aliases:
+      - "ICML"
+      - "International Conference on Machine Learning"
+      - "Proc. ICML"
+      - "Proceedings of ICML"
+    cvf_code: null
+    openreview_id: "ICML.cc"
+
+  AAAI:
+    name: "AAAI Conference on Artificial Intelligence"
+    aliases:
+      - "AAAI"
+      - "AAAI Conference on Artificial Intelligence"
+      - "Proceedings of the AAAI Conference on Artificial Intelligence"
+      - "Proc. AAAI"
+    cvf_code: null
+    openreview_id: null
+
+  ACMMM:
+    name: "ACM International Conference on Multimedia"
+    aliases:
+      - "ACM MM"
+      - "ACMMM"
+      - "ACM Multimedia"
+      - "ACM International Conference on Multimedia"
+    cvf_code: null
+    openreview_id: null
+
+profiles:
+  winter_yolo:
+    keywords:
+      - object detection
+      - lightweight object detection
+      - real-time object detection
+      - YOLO
+      - efficient detector
+      - backbone
+      - neck
+      - feature fusion
+      - state space model
+      - strip convolution
+      - depthwise convolution
+      - road scene detection
+    venues:
+      - CVPR
+      - ICCV
+      - ECCV
+      - NeurIPS
+      - ICLR
+      - AAAI
+      - ACMMM
+      - WACV

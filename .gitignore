@@ -1,0 +1,12 @@
+.env
+*.sqlite
+data/*.sqlite
+downloads/
+__pycache__/
+*.pyc
+.DS_Store
+.vscode/
+.idea/
+dist/
+build/
+*.egg-info/
